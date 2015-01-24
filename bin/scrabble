@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby -I../lib
+require 'engine/main_loop'
+
+require 'scrabble/game'
+require 'scrabble/input'
+require 'scrabble/renderer'
+
+
+game = Scrabble::Game.new
+renderer = Scrabble::Renderer.new game
+main_loop = Engine::MainLoop.new game, renderer
+main_loop.add_input Scrabble::Input.new game
+main_loop.run
