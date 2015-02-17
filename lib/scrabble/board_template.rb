@@ -5,7 +5,7 @@ module Scrabble
 class BoardTemplate
     ##
     # This is the only function that must be implemented, it returns the cell that should occupy the position passed to it
-    def get_at position
+    def at x,y 
     raise NotImplementedError
     end
 
@@ -18,9 +18,8 @@ class BoardTemplate
             @height = height
         end
     
-        def get_at location 
-            x,y = location.x,location.y
-            @grid.at(Position.new x% @width, y% @height) 
+        def at x,y 
+            @grid[y% @height][x% @width]
         end
     end
 end

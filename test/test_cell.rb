@@ -2,11 +2,11 @@ require "minitest"
 require "minitest/autorun"
 
 require "scrabble/cell"
-require "scrabble/letter"
+require "scrabble/piece"
 
 class TestCell < Minitest::Test
     def setup
-       Scrabble::Letter.values = 
+       Scrabble::Piece.values = 
        {
            "EAIONRTLSU" => 1,
            "DG" => 2,
@@ -19,7 +19,7 @@ class TestCell < Minitest::Test
            letters.each_char { |chr| values[chr] = value }
        }
        
-       Scrabble::Letter.frequencies = {
+       Scrabble::Piece.frequencies = {
            "E" => 12,
            "AI" => 9,
            "O" => 8,
@@ -30,7 +30,7 @@ class TestCell < Minitest::Test
            "KJXQZ" => 1
        }.map { |k,v| k.chars * v }.flatten
 
-        @letter = Scrabble::Letter.new("Q")
+        @letter = Scrabble::Piece.new("Q")
     end
 
     def test_letter_mul

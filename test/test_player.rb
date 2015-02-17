@@ -2,7 +2,7 @@ require 'minitest'
 require 'minitest/autorun'
 
 require 'scrabble/player'
-require 'scrabble/letter'
+require 'scrabble/piece'
 
 class TestPlayer < Minitest::Test
     def setup
@@ -33,9 +33,9 @@ class TestRack < Minitest::Test
     end
 
     def test_add_letter
-        assert_kind_of Scrabble::Rack, @rack.add_letter(Scrabble::Letter.new "A")
-        assert_kind_of Scrabble::Rack, @rack.add_letter(Scrabble::Letter.new "B")
-        assert_kind_of Scrabble::Rack, @rack.add_letter(Scrabble::Letter.new "C")
+        assert_kind_of Scrabble::Rack, @rack.add_letter(Scrabble::Piece.new "A")
+        assert_kind_of Scrabble::Rack, @rack.add_letter(Scrabble::Piece.new "B")
+        assert_kind_of Scrabble::Rack, @rack.add_letter(Scrabble::Piece.new "C")
 
         assert_equal 3, @rack.count
     end

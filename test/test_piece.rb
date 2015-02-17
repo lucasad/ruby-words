@@ -1,9 +1,9 @@
 require "minitest"
 require "minitest/autorun"
 
-require "scrabble/letter"
+require "scrabble/piece"
 
-class TestLetters < Minitest::Test
+class TestPieces < Minitest::Test
     def setup
        @values = 
        {
@@ -39,25 +39,25 @@ class TestLetters < Minitest::Test
     end
 
     #def test_need_values_set
-    #    assert_raises(RuntimeError) { Scrabble::Letter.value_of "H" }
+    #    assert_raises(RuntimeError) { Scrabble::Piece.value_of "H" }
     #end
 
     #def test_need_frequencies_set
-    #    assert_raises(RuntimeError) { Scrabble::Letter.random }
+    #    assert_raises(RuntimeError) { Scrabble::Piece.random }
     #end
 
     def test_value_of
-        Scrabble::Letter.values = @values
-        letter_a = Scrabble::Letter.new("A")
+        Scrabble::Piece.values = @values
+        letter_a = Scrabble::Piece.new("A")
         assert_equal letter_a.value, 1
         assert letter_a.value.is_a? Numeric
     end
 
     def test_random
-        Scrabble::Letter.frequencies = @frequencies
-        assert_kind_of String, Scrabble::Letter.random
-        letter = Scrabble::Letter.new
-        assert_kind_of Scrabble::Letter, letter
+        Scrabble::Piece.frequencies = @frequencies
+        assert_kind_of String, Scrabble::Piece.random
+        letter = Scrabble::Piece.new
+        assert_kind_of Scrabble::Piece, letter
         assert_kind_of String, letter.letter 
     end
 end
