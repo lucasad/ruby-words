@@ -2,7 +2,10 @@ require 'engine/renderer'
 
 module Scrabble
 class Renderer < Engine::Renderer
-    def draw
+    def render game
+        clear
+        place game.board_view, 0,0
+        present
     end
 
 end

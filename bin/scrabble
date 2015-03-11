@@ -1,13 +1,82 @@
-#!/usr/bin/env ruby -I../lib
+#!/usr/bin/env ruby 
+$LOAD_PATH << File.join(File.dirname(__FILE__), "../lib")
 require 'engine/main_loop'
+require 'engine/text'
 
-require 'scrabble/game'
-require 'scrabble/input'
-require 'scrabble/renderer'
+require 'scrabble'
+
+Scrabble::Piece.values = 
+{
+    "EAIONRTLSU" => 1,
+    "DG" => 2,
+    "BCMP" => 3,
+    "FHVWY" => 4,
+    "K" => 5,
+    "JX" => 8,
+    "QZ" => 10
+}.each_with_object({}) { |(letters, value), values|
+    letters.each_char { |chr| values[chr] = value }
+}
+
+Scrabble::Piece.frequencies = {
+    "E" => 12,
+    "AI" => 9,
+    "O" => 8,
+    "NRT" => 6,
+    "LSUD" => 4,
+    "G" => 3,
+    "BCMPFHVWY" => 2,
+    "KJXQZ" => 1
+}.map { |k,v| k.chars * v }.flatten
+
+grid = ((<<EOF
+3WS,,,2LS,,,,3WS,,,,2LS,,
+,2WS,,,,3LS,,,,3LS,,,,2WS
+,,2WS,,,,2LS,,2LS,,,,2WS,
+2LS,,,2WS,,,,2LS,,,,2WS,,
+,,,,2WS,,,,,,2WS,,,
+,3LS,,,,3LS,,,,3LS,,,,3LS
+,,2LS,,,,2LS,,2LS,,,,2LS,
+3WS,,,2LS,,,,2WS,,,,2LS,,
+,,2LS,,,,2LS,,2LS,,,,2LS,
+,3LS,,,,3LS,,,,3LS,,,,3LS
+,,,,2WS,,,,,,2WS,,,
+2LS,,,2LS,,,,2LS,,,,2WS,,
+,,2WS,,,,2LS,,2LS,,,,2WS,
+,2WS,,,,3LS,,,,3LS,,,,2WS
+EOF
+).lines.map { |row|
+    row.chomp!.split(",",-1).map { |cell|
+        cell =~ /(\d)([WL])S/
+        Scrabble::Cell.new case $2
+        when "W"
+            :word
+        when "L"
+            :letter
+        else
+            :normal
+        end , $1
+    }
+})
+
+template = Scrabble::BoardTemplate::Tiling.new grid, 14,14
 
 
-game = Scrabble::Game.new
-renderer = Scrabble::Renderer.new game
+board = Scrabble::Board.new template
+
+
+Scrabble::Cell.size = 40
+
+game = Scrabble::Game.new board
+window = SDL2::Window.create("Scrabble", 0,0, 600,600, SDL2::Window::Flags::SHOWN|SDL2::Window::Flags::RESIZABLE)
+renderer = Scrabble::Renderer.new window
+
+game.calculate_viewport *window.size
+
+word = `grep '^[a-z]*$' /usr/share/dict/words | shuf | head -n1`.strip.upcase
+word.each_char.each_with_index { |letter, i|
+    game.board.place Scrabble::Piece.new(letter), i,7
+}
 main_loop = Engine::MainLoop.new game, renderer
-main_loop.add_input Scrabble::Input.new game
+main_loop.add_input Scrabble::Input.new game, window
 main_loop.run

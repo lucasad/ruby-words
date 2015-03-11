@@ -1,0 +1,4 @@
+[submodule "vendor/nykac-ruby-engine"]
+	path = vendor/nykac-ruby-engine
+	url = https://github.com/nykac/ruby-engine
+	branch = gfx

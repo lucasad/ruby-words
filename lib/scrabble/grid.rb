@@ -6,12 +6,12 @@ class Grid
         @grid = Hash.new
     end
 
-    def place item, position
-        @grid[position] = item
+    def place item, x,y 
+        @grid[[x,y]] = item
     end
 
-    def at position
-        @grid[position]
+    def at x,y 
+        @grid[[x,y]]
     end
 
     def each &fn
