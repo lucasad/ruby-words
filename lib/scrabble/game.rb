@@ -1,17 +1,20 @@
 require 'engine/game'
 require 'scrabble/board_viewport'
-require 'scrabble/piece'
+require 'scrabble/tile'
 
 module Scrabble
 class Game < Engine::Game
-    attr_reader :board, :board_view, :player
+    attr_reader :board, :board_view, :player, :rack
     attr_accessor :width, :height, :origin
+    attr_accessor :selected, :cursor
 
-    def initialize board
-        @board = board
+    def initialize **kwargs 
+        @board = kwargs[:board]
         @state
-        @board_view = Scrabble::BoardViewport.new board
-        @board.place Piece.new, 1,1
+        @board_view = Scrabble::BoardViewport.new kwargs 
+        @rack = Rack.new
+        @selected = nil
+        @cursor = [0,0]
     end
 
     #likely unneeded

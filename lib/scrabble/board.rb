@@ -1,34 +1,74 @@
 require 'scrabble/grid'
 module Scrabble
 class Board
-    def initialize(template)
+
+    ##
+    # Create an new board
+    # @param pending [Grid] The pieces that haven't been validated and aren't fully commited yet
+    # @param placed [Grid] The pieces on the board that have been placed
+    # @param template [Template] The template for the background spaces
+    def initialize(pending, placed, template)
+        @pending = pending
+        @placed = placed
         @template = template
-        @cells = Grid.new
-    end
-
-    def rect_do rect, &fn
-        x,y = rect.position
-        w,h = rect.width,rect.height
-        ((y...y+h).each_with_index { |y,row|
-            (x...x+w).each_with_index { |x,collumn|
-                fn.call collumn,row, at(x,y)
-            }
-        })
-        nil
-    end
-
-#    private
-    def at(x,y)
-        @cells.at(x,y) or @template.at(x,y)
+        @pending_words = PendingWords.new(@pending, @placed, self)
     end
 
     ##
     # Place piece at position
     def place piece, x,y
-        cell = at(x,y).dup
-        cell.piece = piece
-        @cells.place cell, x,y 
+        @pending_words.place [x,y]
+        @pending.place piece, x,y 
     end
+
+
+    ##
+    # Determines if there is a tile at the position
+    def occupied(position)
+        !!tile_at(position)
+    end
+
+    ##
+    # Return the spaces horizontal and vertical 
+    def get_adjacent(position)
+        x,y = position
+        [tile_at([x+1,y]),
+         tile_at([x-1,y]),
+         tile_at([x,y+1]),
+         tile_at([x,y-1])]
+    end
+
+    def at(x,y)
+        @template.at(x,y)
+    end
+
+    def score
+        p @pending_words.score
+    end
+
+    ##
+    # Determine if it is connected
+    def adjacent?(position)
+        get_adjacent(position).compact > 1
+    end
+
+    ##
+    # Gets the tile at the position
+    # @param [
+    def tile_at(position)
+        @placed.at(*position) or @pending.at(*position)
+    end
+
+    def add_pieces(pieces)
+        pieces.each {|k,v| @placed[k] = v }
+        nil
+    end
+
+    def finalize
+        add_pieces pending
+        @pending.clear
+    end
+
 
 end
 end

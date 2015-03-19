@@ -1,11 +1,12 @@
 #!/usr/bin/env ruby
-$LOAD_PATH.concat ["../Engine/lib", "-Ilib"]
+$LOAD_PATH << File.join(File.dirname(__FILE__), '../lib')
 require 'engine/main_loop'
 require 'engine/text'
-
 require 'scrabble'
+require 'ruby-prof'
 
-Scrabble::Piece.values = 
+include Scrabble
+Tile.values = 
 {
     "EAIONRTLSU" => 1,
     "DG" => 2,
@@ -18,7 +19,7 @@ Scrabble::Piece.values =
     letters.each_char { |chr| values[chr] = value }
 }
 
-Scrabble::Piece.frequencies = {
+Tile.frequencies = {
     "E" => 12,
     "AI" => 9,
     "O" => 8,
@@ -29,7 +30,7 @@ Scrabble::Piece.frequencies = {
     "KJXQZ" => 1
 }.map { |k,v| k.chars * v }.flatten
 
-grid = ((<<EOF
+Template = BoardTemplate::Tiling.new((<<EOF
 3WS,,,2LS,,,,3WS,,,,2LS,,
 ,2WS,,,,3LS,,,,3LS,,,,2WS
 ,,2WS,,,,2LS,,2LS,,,,2WS,
@@ -48,35 +49,33 @@ EOF
 ).lines.map { |row|
     row.chomp!.split(",",-1).map { |cell|
         cell =~ /(\d)([WL])S/
-        Scrabble::Cell.new case $2
+        Space.new case $2
         when "W"
             :word
         when "L"
             :letter
         else
             :normal
-        end , $1
+        end , $1.to_i
     }
-})
+}, 14, 14)
 
-template = Scrabble::BoardTemplate::Tiling.new grid, 14,14
+Space.size = 40
 
-
-board = Scrabble::Board.new template
-
-
-#word = `grep '^[a-z]*$' /usr/share/dict/words | shuf | head -n1`.strip
-#p word
-
-Scrabble::Cell.size = 40
-
-game = Scrabble::Game.new board
-window = SDL2::Window.create("Scrabble", 0,0, 600,600, SDL2::Window::Flags::SHOWN|SDL2::Window::Flags::RESIZABLE)
-renderer = Scrabble::Renderer.new window
-
-game.calculate_viewport *window.size
+pending,placed = Grid.new, Grid.new  
+board = Board.new pending,placed, Template
 
 
-main_loop = Engine::MainLoop.new game, renderer
-main_loop.add_input Scrabble::Input.new game, window
-main_loop.run
+game = Game.new :pending => pending,
+                :placed => placed,
+                :board => board,
+                :template => Template
+
+window = SDL2::Window.create("Scrabble", 0,0, 738, 675, SDL2::Window::Flags::SHOWN|SDL2::Window::Flags::RESIZABLE)
+view = Renderer.new(window,game)
+
+RubyProf.measure_mode = RubyProf::CPU_TIME
+RubyProf.start
+Engine::MainLoop.new(game, view).
+    add_input(Input.new(game, view)).
+    run

@@ -4,21 +4,47 @@ class Input < Engine::Input
     include Engine::Input::MouseInput
     include Engine::Input::WindowInput
 
-    def initialize game, window
+    def initialize game, view 
         @game = game
-        mouse_init 0
-        window_init window
+        @window = view.window
+        mouse_init @window, 0
+        window_init @window
+    end
+
+    def mouse_move dx,dy
+        @game.cursor = [@x,@y]
     end
 
     def mouse_press button
-        p @x, @y
-        pos = @game.board_view.at @x,@y
-        @game.board.place Piece.new, *pos unless @game.board.at(*pos).piece
-        @game.board_view.render
+        unless (0..@game.board_view.h).cover? @y
+            x = @x / (Space.size+1)
+            if x < @game.rack.count
+                @game.selected = @game.rack.get(x)
+            end
+            @game.board_view.render
+        else
+            @game.board.score
+        end
+    end
+
+    def mouse_release button
+        if (0..@game.board_view.h).cover? @y and (0..@game.board_view.w).cover? @x
+            return unless @game.selected
+
+            position = @game.board_view.at @x,@y
+            unless @game.board.occupied(position)
+                @game.board.place(@game.selected, *position)
+                @game.rack.remove(@game.selected)
+                @game.selected = nil
+                @game.board_view.render
+                @game.rack.render
+            end
+        end
     end
 
     def window_resized width, height
-        @game.calculate_viewport width, height
+        p [width, height]
+        @game.calculate_viewport width-123, height-60
     end
     def window_close
         RubyProf::FlatPrinter.new(RubyProf.stop).print(STDOUT)
