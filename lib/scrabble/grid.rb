@@ -18,6 +18,12 @@ class Grid
         @grid.each &fn
     end
 
+    def clear
+        values = @grid.values
+        @grid.clear
+        values
+    end
+
     def in_rect rect, &fn
         x,y = rect.position.x, rect.position.y 
         w,h = rect.width, rect.height

@@ -4,7 +4,7 @@ require 'scrabble/tile'
 
 module Scrabble
 class Game < Engine::Game
-    attr_reader :board, :board_view, :player, :rack
+    attr_reader :board, :board_view, :player, :rack, :score
     attr_accessor :width, :height, :origin
     attr_accessor :selected, :cursor
 
@@ -15,6 +15,7 @@ class Game < Engine::Game
         @rack = Rack.new
         @selected = nil
         @cursor = [0,0]
+        @score = 0
     end
 
     #likely unneeded
@@ -27,8 +28,22 @@ class Game < Engine::Game
         nil
     end
 
-    def visible_cells &fn
-        @board.rect_do Rect.new(@origin, @width, @height), &fn
+    def turn_end
+        if @board.pending_valid?
+            p @score, @board.score
+            p @score, @board.score
+            @score = @score + @board.score
+            @board.finalize
+            @rack.refill
+
+            @rack.render
+            @board_view.render
+        else
+            @board.cancel.each {|tile| @rack.append tile }
+
+            @rack.render
+            @board_view.render
+        end
     end
 end
 end

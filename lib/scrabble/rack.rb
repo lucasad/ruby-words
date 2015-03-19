@@ -13,19 +13,22 @@ class Rack
     # Add a letter to the rack 
     def append letter 
         @letters << letter  
+        render
         self
     end
 
     ##
     # Refills the rack so that it has 7 tiles again
     def refill
-        @letters.concat (count..7).map { Tile::new }
+        @letters.concat (count..7-1).map { Tile::new }
+        self
     end
 
     ##
     # Removes letter from the rack
     def remove letter
         @letters.delete_if { |a_letter| a_letter.__id__ == letter.__id__}
+        self
     end
 
     ##
@@ -42,12 +45,12 @@ class Rack
     end
 
     def draw renderer
-        p "drawing rack"
         renderer.draw_color = [0,0,0]
         renderer.clear
         @letters.each_with_index {|tile, i|
             place renderer, tile.draw(renderer), i*(Space.size+1), 0
         }
+        renderer.draw_color = [0,0,0]
     end
 
     include Engine::Drawable

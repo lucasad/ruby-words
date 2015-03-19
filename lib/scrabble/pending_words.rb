@@ -21,7 +21,9 @@ class PendingWords
         nil
     end
 
-
+    ##
+    # Calculates the words that are created when a piece is placed 
+    # @param position [Fixnum,Fixnum] The position of the piece
     def place position
         x,y = position
 
@@ -30,8 +32,6 @@ class PendingWords
         topmost= most(position, Top)
         bottommost= most(position, Bottom)
 
-        p leftmost
-
         (leftmost[0]..rightmost[0]).each {|x| @horizontal.delete [x,y]}
         (topmost[1]..bottommost[1]).each {|y| @vertical.delete [x,y]}
 
@@ -39,6 +39,8 @@ class PendingWords
         @vertical[topmost] = bottommost[1] 
     end
 
+    ##
+    # Calculates the value of the words
     def score
         h = @horizontal.reject { |(x,y),r| x==r }
         v = @vertical.reject { |(x,y),r| y==r }
@@ -76,6 +78,8 @@ class PendingWords
         (hs.reduce(:+)||0) + (vs.reduce(:+)||0) 
     end
 
+    ##
+    # Verifies that all words are valid
     def all_valid 
         h = @horizontal.reject { |(x,y),r| x==r }
         v = @vertical.reject { |(x,y),r| y==r }
@@ -86,7 +90,6 @@ class PendingWords
         }
         words.concat v.map {|position, bottom|
             x,y = position
-            p [y,bottom]
             (y..bottom).map { |y| @board.tile_at([x,y]) }
         }
 

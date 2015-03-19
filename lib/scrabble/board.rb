@@ -43,7 +43,11 @@ class Board
     end
 
     def score
-        p @pending_words.score
+        @pending_words.score
+    end
+
+    def pending_valid?
+        @pending_words.all_valid
     end
 
     ##
@@ -60,12 +64,18 @@ class Board
     end
 
     def add_pieces(pieces)
-        pieces.each {|k,v| @placed[k] = v }
+        pieces.each {|k,v| @placed.place v,*k }
         nil
     end
 
+    def cancel
+        @pending_words.reset
+        @pending.clear
+    end
+
     def finalize
-        add_pieces pending
+        add_pieces @pending
+        @pending_words.reset
         @pending.clear
     end
 

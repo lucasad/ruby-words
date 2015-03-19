@@ -1,1 +1,11 @@
+=Word Game
+
 A scrabble-like game in ruby
+
+Init the submodules before running the game's script `./bin/scrabble`
+
+The {engine}[https://github.com/nykac/ruby-engine] has SDL2, SDL2_TTF, and ruby-sdl2 as dependincies, see its {README}[https://github.com/nykac/ruby-engine/blob/master/README.rdoc] for the specifics.
+
+==Gameplay
+
+Drag and drop the tiles to their position. Press <R> to reset the tiles and <Enter> to end your turn (if the moves are valid).

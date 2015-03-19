@@ -42,10 +42,27 @@ class Input < Engine::Input
         end
     end
 
+    def _keyboard event
+        case event
+        when SDL2::Event::KeyUp
+            case event.scancode
+                when 21 # <r>
+                @game.board.cancel.each {|tile| @game.rack.append tile }
+                @game.board_view.render
+                when 40 # <enter>
+                @game.turn_end
+                @game.board_view.render
+                else
+                p event.scancode
+            end
+        when SDL2::Event::KeyDown
+        end
+    end 
+
     def window_resized width, height
-        p [width, height]
         @game.calculate_viewport width-123, height-60
     end
+
     def window_close
         RubyProf::FlatPrinter.new(RubyProf.stop).print(STDOUT)
         exit
